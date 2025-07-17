@@ -35,8 +35,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
-    'cart.apps.CartConfig',
     'mpesa.apps.MpesaConfig',
+    'cart.apps.CartConfig',
     'shop.apps.ShopConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -135,6 +135,9 @@ MEDIA_ROOT=  os.path.join(BASE_DIR, 'media/')
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# MPESA settings
-MPESA_CONSUMER_KEY = 'taNaJdbyVwtEBBSqYGkPeHZJI2MF0eE4GrRKSEbv0LibtjxW'
-MPESA_CONSUMER_SECRET = 'ApZFz1BTjLGrIeGOH9g8EG1FfNDbe2egOJ3MVqRhxl1tH6GwfCAhD2jdPwmvs0Kg'
+from decouple import config
+
+MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE = config('MPESA_SHORTCODE')
+MPESA_PASSKEY = config('MPESA_PASSKEY')

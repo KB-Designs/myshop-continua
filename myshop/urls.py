@@ -23,8 +23,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cart/', include('cart.urls', namespace='cart')),
-    path('mpesa/', include('mpesa.urls', namespace='mpesa')),  # MPESA URLs
     path('orders/', include('orders.urls', namespace='orders')),
+    path('mpesa/', include('mpesa.urls')),
     path('', include('shop.urls', namespace='shop')),  # correct
     
 ]
