@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 CART_SESSION_ID='cart'
 
 
@@ -135,9 +136,11 @@ MEDIA_ROOT=  os.path.join(BASE_DIR, 'media/')
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-from decouple import config
 
+MPESA_ENVIRONMENT = config('MPESA_ENVIRONMENT')
 MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY')
 MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET')
 MPESA_SHORTCODE = config('MPESA_SHORTCODE')
 MPESA_PASSKEY = config('MPESA_PASSKEY')
+MPESA_INITIATOR_NAME = config('MPESA_INITIATOR_NAME')
+MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
