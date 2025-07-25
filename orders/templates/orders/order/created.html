@@ -1,9 +1,19 @@
 {% extends "shop/base.html" %}
+
 {% block title %}
- Thank you
+  Thank You
 {% endblock %}
+
 {% block content %}
- <h1>Thank you</h1>
- <p>Your order has been successfully completed. Your order number is
- <strong>{{ order.id }}</strong>.</p>
+  <h1>Thank You!</h1>
+  <p>Your order has been placed successfully.</p>
+  <p>Your order number is <strong>#{{ order.id }}</strong>.</p>
+
+  <p>
+    If you selected M-Pesa as your payment method, check your phone for an STK push request to complete the payment.
+  </p>
+
+  <p>
+    <a href="{% url 'shop:product_list' %}">← Back to Shopping</a>
+  </p>
 {% endblock %}

@@ -1,24 +1,80 @@
 {% extends "shop/base.html" %}
+
 {% block title %}
- Checkout
+  Checkout
 {% endblock %}
+
 {% block content %}
- <h1>Checkout</h1>
- <div class="order-info">
- <h3>Your order</h3>
- <ul>
- {% for item in cart %}
- <li>
- {{ item.quantity }}x {{ item.product.name }}
- <span>${{ item.total_price }}</span>
- </li>
- {% endfor %}
- </ul>
- <p>Total: ${{ cart.get_total_price }}</p>
- </div>
- <form method="post" class="order-form">
- {{ form.as_p }}
- <p><input type="submit" value="Place order"></p>
- {% csrf_token %}
- </form>
+  <h1>Checkout</h1>
+
+  <div class="order-info">
+    <h3>Your Order</h3>
+    <ul>
+      {% for item in cart %}
+        <li>
+          {{ item.quantity }} x {{ item.product.name }} - Ksh {{ item.total_price }}
+        </li>
+      {% endfor %}
+    </ul>
+    <p><strong>Total: Ksh {{ cart.get_total_price }}</strong></p>
+  </div>
+
+  <hr>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <h3>Customer Details</h3>
+    <p>{{ form.first_name.label_tag }} {{ form.first_name }}</p>
+    <p>{{ form.last_name.label_tag }} {{ form.last_name }}</p>
+    <p>{{ form.email.label_tag }} {{ form.email }}</p>
+    <p>{{ form.phone.label_tag }} {{ form.phone }}</p>
+
+    <h3>Delivery Information</h3>
+    <p>{{ form.county.label_tag }} {{ form.county }}</p>
+    <p>{{ form.pickup_station.label_tag }} {{ form.pickup_station }}</p>
+
+    <h3>Payment</h3>
+    <p>{{ form.payment_method.label_tag }} {{ form.payment_method }}</p>
+
+    <p><input type="submit" value="Place Order"></p>
+  </form>
+
+  <p><a href="{% url 'shop:product_list' %}">← Continue Shopping</a></p>
 {% endblock %}
+
+{% block extra_scripts %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const countySelect = document.getElementById('id_county');
+    const pickupSelect = document.getElementById('id_pickup_station');
+
+    // Trigger fetch when county is changed
+    countySelect.addEventListener('change', function () {
+        const county = this.value;
+        if (!county) return;
+
+        fetch(`/orders/ajax/load-pickup-stations/?county=${county}`)
+            .then(response => response.json())
+            .then(data => {
+                pickupSelect.innerHTML = '';
+                data.stations.forEach(function (station) {
+                    const option = document.createElement('option');
+                    option.value = station;
+                    option.text = station;
+                    pickupSelect.appendChild(option);
+                });
+            });
+    });
+
+    // 🟡 Optional: Auto-trigger on page load if county is already selected (for validation errors)
+    if (countySelect.value) {
+        const event = new Event('change');
+        countySelect.dispatchEvent(event);
+    }
+});
+</script>
+
+{% endblock %}
+
