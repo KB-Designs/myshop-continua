@@ -154,3 +154,9 @@ MPESA_SHORTCODE = config('MPESA_SHORTCODE')
 MPESA_PASSKEY = config('MPESA_PASSKEY')
 MPESA_INITIATOR_NAME = config('MPESA_INITIATOR_NAME')
 MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
+
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "6fad045f297e.ngrok-free.app",  # 👈 your Ngrok domain
+]

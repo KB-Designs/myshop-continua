@@ -1,0 +1,7 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+  <h2>MPESA Payment</h2>
+  <p>We’ve sent an M-PESA STK push to <strong>{{ order.phone }}</strong> for Order #{{ order.id }}.</p>
+  <p>Please check your phone and enter your M-PESA PIN to complete the payment.</p>
+{% endblock %}

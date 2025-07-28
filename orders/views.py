@@ -9,6 +9,8 @@ from cart.cart import Cart
 from orders.tasks import order_created
 
 
+
+
 def order_create(request):
     cart = Cart(request)
 
@@ -27,9 +29,10 @@ def order_create(request):
 
             cart.clear()
 
-            # Send email notification task
+            # Optionally send email/task
             order_created.delay(order.id)
 
+            # Handle M-Pesa redirect
             if order.payment_method == 'mpesa':
                 request.session['mpesa_order_id'] = order.id
                 request.session['mpesa_phone'] = order.phone
@@ -40,7 +43,10 @@ def order_create(request):
     else:
         form = OrderCreateForm()
 
-    return render(request, 'orders/order/create.html', {'cart': cart, 'form': form})
+    return render(request, 'orders/order/create.html', {
+        'form': form,
+        'cart': cart,
+    })
 
 
 def order_created_view(request, order_id):
@@ -58,3 +64,4 @@ def load_pickup_stations(request):
     }
     stations = pickup_options.get(county, [])
     return JsonResponse({'stations': stations})
+

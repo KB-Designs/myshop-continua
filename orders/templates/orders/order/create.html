@@ -21,60 +21,47 @@
 
   <hr>
 
-  <form method="post">
+  <form method="post" novalidate>
     {% csrf_token %}
-
-    <h3>Customer Details</h3>
-    <p>{{ form.first_name.label_tag }} {{ form.first_name }}</p>
-    <p>{{ form.last_name.label_tag }} {{ form.last_name }}</p>
-    <p>{{ form.email.label_tag }} {{ form.email }}</p>
-    <p>{{ form.phone.label_tag }} {{ form.phone }}</p>
-
-    <h3>Delivery Information</h3>
-    <p>{{ form.county.label_tag }} {{ form.county }}</p>
-    <p>{{ form.pickup_station.label_tag }} {{ form.pickup_station }}</p>
-
-    <h3>Payment</h3>
-    <p>{{ form.payment_method.label_tag }} {{ form.payment_method }}</p>
-
-    <p><input type="submit" value="Place Order"></p>
+    {{ form.as_p }}
+    <button type="submit">Place Order</button>
   </form>
 
   <p><a href="{% url 'shop:product_list' %}">← Continue Shopping</a></p>
 {% endblock %}
 
 {% block extra_scripts %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const countySelect = document.getElementById('id_county');
+      const pickupSelect = document.getElementById('id_pickup_station');
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const countySelect = document.getElementById('id_county');
-    const pickupSelect = document.getElementById('id_pickup_station');
-
-    // Trigger fetch when county is changed
-    countySelect.addEventListener('change', function () {
-        const county = this.value;
-        if (!county) return;
-
+      function updatePickupStations(county) {
         fetch(`/orders/ajax/load-pickup-stations/?county=${county}`)
-            .then(response => response.json())
-            .then(data => {
-                pickupSelect.innerHTML = '';
-                data.stations.forEach(function (station) {
-                    const option = document.createElement('option');
-                    option.value = station;
-                    option.text = station;
-                    pickupSelect.appendChild(option);
-                });
+          .then(response => response.json())
+          .then(data => {
+            pickupSelect.innerHTML = '';
+            data.stations.forEach(function (station) {
+              const option = document.createElement('option');
+              option.value = station;
+              option.text = station;
+              pickupSelect.appendChild(option);
             });
+          });
+      }
+
+      if (countySelect) {
+        countySelect.addEventListener('change', function () {
+          if (this.value) {
+            updatePickupStations(this.value);
+          }
+        });
+
+        // Auto-trigger if a county is already selected (e.g. after form error)
+        if (countySelect.value) {
+          updatePickupStations(countySelect.value);
+        }
+      }
     });
-
-    // 🟡 Optional: Auto-trigger on page load if county is already selected (for validation errors)
-    if (countySelect.value) {
-        const event = new Event('change');
-        countySelect.dispatchEvent(event);
-    }
-});
-</script>
-
+  </script>
 {% endblock %}
-

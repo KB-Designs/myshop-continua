@@ -13,6 +13,14 @@
     If you selected M-Pesa as your payment method, check your phone for an STK push request to complete the payment.
   </p>
 
+  <!-- ✅ Payment status display -->
+  {% if order.paid %}
+      <p style="color:green;">✅ Payment received. Thank you!</p>
+      <p>Receipt #: {{ order.mpesa_receipt_number }}</p>
+  {% else %}
+      <p style="color:orange;">⌛ Awaiting payment confirmation...</p>
+  {% endif %}
+
   <p>
     <a href="{% url 'shop:product_list' %}">← Back to Shopping</a>
   </p>

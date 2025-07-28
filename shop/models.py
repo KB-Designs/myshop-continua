@@ -32,6 +32,9 @@ class Product(models.Model):
     available=models.BooleanField(default=True)
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
+    # orders/models.py
+
+
 
     class Meta:
         ordering=('name',)
