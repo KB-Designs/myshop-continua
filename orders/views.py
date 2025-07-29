@@ -65,3 +65,6 @@ def load_pickup_stations(request):
     stations = pickup_options.get(county, [])
     return JsonResponse({'stations': stations})
 
+def order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/order_created.html', {'order': order})

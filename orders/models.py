@@ -22,7 +22,6 @@ PICKUP_STATION_CHOICES = {
     'Kisumu': ['Milimani', 'Kondele'],
 }
 
-
 class Order(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -31,7 +30,17 @@ class Order(models.Model):
     county = models.CharField(max_length=100, choices=COUNTY_CHOICES)
     pickup_station = models.CharField(max_length=100)  # Filled via dropdown in form
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES)
+    
     paid = models.BooleanField(default=False)
+    payment_status = models.CharField(max_length=20, choices=[
+        ('Pending', 'Pending'),
+        ('Paid', 'Paid'),
+        ('Failed', 'Failed')
+    ], default='Pending')
+    payment_reference = models.CharField(max_length=100, blank=True, null=True)
+    checkout_request_id = models.CharField(max_length=255, blank=True, null=True)
+    mpesa_phone = models.CharField(max_length=15, blank=True, null=True)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -43,7 +52,6 @@ class Order(models.Model):
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
-
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)

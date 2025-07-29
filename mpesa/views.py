@@ -1,15 +1,13 @@
-# mpesa/views.py
 import base64
+import json
 import requests
 from datetime import datetime
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from orders.models import Order
-
 from django.views.decorators.csrf import csrf_exempt
-import json
 from orders.models import Order
+import logging
 
 def format_phone_number(phone):
     phone = phone.strip().replace(' ', '').replace('+', '')
@@ -23,6 +21,9 @@ def format_phone_number(phone):
     else:
         return phone  # fallback
 
+
+
+
 def stk_push(request):
     order_id = request.session.get('mpesa_order_id')
     phone = request.session.get('mpesa_phone')
@@ -30,7 +31,6 @@ def stk_push(request):
     if not order_id or not phone:
         return redirect('orders:order_create')
 
-    # ✅ Format the phone number right after retrieving it
     formatted_phone = format_phone_number(phone)
 
     try:
@@ -40,14 +40,25 @@ def stk_push(request):
             'error': {'errorMessage': 'Order not found'}
         })
 
-    # Step 1: Get access token
+    # Access token
     consumer_key = settings.MPESA_CONSUMER_KEY
     consumer_secret = settings.MPESA_CONSUMER_SECRET
     auth_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-    auth_response = requests.get(auth_url, auth=(consumer_key, consumer_secret))
-    access_token = auth_response.json().get('access_token')
 
-    # Step 2: Prepare STK Push request
+    auth_response = requests.get(auth_url, auth=(consumer_key, consumer_secret))
+    try:
+        access_token = auth_response.json().get('access_token')
+    except ValueError:
+        print("⚠️ Failed to decode access token JSON:", auth_response.text)
+        return render(request, 'mpesa/stk_push_error.html', {
+            'error': {'errorMessage': 'Unable to get access token from M-Pesa'}
+        })
+
+    if not access_token:
+        return render(request, 'mpesa/stk_push_error.html', {
+            'error': {'errorMessage': 'Access token not found in response'}
+        })
+
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     password = base64.b64encode(
         (settings.MPESA_SHORTCODE + settings.MPESA_PASSKEY + timestamp).encode()
@@ -78,47 +89,57 @@ def stk_push(request):
         headers=headers
     )
 
-    res_data = response.json()
+    try:
+        res_data = response.json()
+    except ValueError:
+        print("⚠️ M-Pesa STK Push response not JSON:", response.text)
+        return render(request, 'mpesa/stk_push_error.html', {
+            'order': order,
+            'error': {'errorMessage': 'Invalid response from M-Pesa STK Push'}
+        })
+
     if response.status_code == 200 and res_data.get('ResponseCode') == '0':
+        order.checkout_request_id = res_data.get('CheckoutRequestID')
+        order.mpesa_phone = formatted_phone
+        order.save()
         return render(request, 'mpesa/stk_push_sent.html', {'order': order})
     else:
-        return render(request, 'mpesa/stk_push_error.html', {'order': order, 'error': res_data})
+        return render(request, 'mpesa/stk_push_error.html', {
+            'order': order,
+            'error': res_data
+        })
 
 
-#callback view to handle M-Pesa responses
 @csrf_exempt
 def mpesa_callback(request):
-    data = json.loads(request.body.decode('utf-8'))
+    data = json.loads(request.body)
 
     try:
         stk_callback = data['Body']['stkCallback']
         result_code = stk_callback['ResultCode']
+        checkout_request_id = stk_callback['CheckoutRequestID']
+
+        try:
+            order = Order.objects.get(checkout_request_id=checkout_request_id)
+        except Order.DoesNotExist:
+            return JsonResponse({'error': 'Order not found'}, status=404)
 
         if result_code == 0:
             metadata = stk_callback['CallbackMetadata']['Item']
-            order_id = int(stk_callback['CheckoutRequestID'].split('-')[-1])  # Optional if you use ref
+            receipt = next(item['Value'] for item in metadata if item['Name'] == 'MpesaReceiptNumber')
+            amount = next(item['Value'] for item in metadata if item['Name'] == 'Amount')
+            phone = next(item['Value'] for item in metadata if item['Name'] == 'PhoneNumber')
 
-            # Extract fields
-            receipt = next(i['Value'] for i in metadata if i['Name'] == 'MpesaReceiptNumber')
-            phone = next(i['Value'] for i in metadata if i['Name'] == 'PhoneNumber')
-            amount = next(i['Value'] for i in metadata if i['Name'] == 'Amount')
-
-            # You can link by reference/account or session
-            order = Order.objects.filter(
-                paid=False,
-                get_total_cost__gte=amount,  # Optional safeguard
-                phone=phone
-            ).last()
-
-            if order:
-                order.paid = True
-                order.mpesa_receipt_number = receipt
-                order.mpesa_phone = phone
-                order.save()
+            order.paid = True
+            order.payment_status = 'Paid'
+            order.payment_reference = receipt
+            order.mpesa_phone = phone
+            order.save()
         else:
-            print("❌ Payment failed:", stk_callback['ResultDesc'])
+            order.payment_status = 'Failed'
+            order.save()
 
     except Exception as e:
         print("Callback error:", str(e))
 
-    return JsonResponse({"ResultCode": 0, "ResultDesc": "Received ok"})
+    return JsonResponse({"ResultCode": 0, "ResultDesc": "Callback received successfully"})
