@@ -158,5 +158,5 @@ MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "3af71731a3b6.ngrok-free.app",  # 👈 your Ngrok domain
+    "21d739e7cdfc.ngrok-free.app",  # 👈 your Ngrok domain
 ]

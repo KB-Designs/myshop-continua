@@ -143,3 +143,18 @@ def mpesa_callback(request):
         print("Callback error:", str(e))
 
     return JsonResponse({"ResultCode": 0, "ResultDesc": "Callback received successfully"})
+
+def payment_status(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+        if order.paid:
+            return JsonResponse({'status': 'paid'})
+        elif order.payment_status == 'Failed':
+            return JsonResponse({'status': 'failed'})
+        else:
+            return JsonResponse({'status': 'pending'})
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'error'}, status=404)
+    
+def payment_failed(request, order_id):
+    return render(request, 'mpesa/payment_failed.html', {'order_id': order_id})    

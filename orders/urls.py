@@ -8,4 +8,6 @@ urlpatterns = [
     path('created/<int:order_id>/', views.order_created_view, name='order_created'), 
     path('ajax/load-pickup-stations/', views.load_pickup_stations, name='ajax_load_pickup_stations'), # ✅ new route
     path('<int:order_id>/status/', views.order_status, name='order_status'),
+    path('thank-you/<int:order_id>/', views.thank_you, name='thank_you'),
+
 ]

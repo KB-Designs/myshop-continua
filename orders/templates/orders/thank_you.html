@@ -1,0 +1,11 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+  <h2>Thank You for Your Order!</h2>
+  <p>Your payment was successful.</p>
+  <p>Order ID: <strong>#{{ order.id }}</strong></p>
+  <p>Amount Paid: Ksh <strong>{{ order.get_total_cost }}</strong></p>
+  <p>We will begin processing your order shortly.</p>
+
+  <a href="{% url 'shop:product_list' %}">Continue Shopping</a>
+{% endblock %}

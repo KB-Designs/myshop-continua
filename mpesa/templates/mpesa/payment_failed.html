@@ -1,0 +1,8 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+  <h2>Payment Failed</h2>
+  <p>We did not receive payment for your order.</p>
+  <p>You may have cancelled the payment or something went wrong.</p>
+  <a href="{% url 'orders:order_create' %}" class="btn">Try Again</a>
+{% endblock %}

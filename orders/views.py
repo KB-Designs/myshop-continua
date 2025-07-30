@@ -7,7 +7,7 @@ from .models import Order, OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
 from orders.tasks import order_created
-
+from .models import Order
 
 
 
@@ -68,3 +68,7 @@ def load_pickup_stations(request):
 def order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/order_created.html', {'order': order})
+
+def thank_you(request, order_id):
+    order = get_object_or_404(Order, id=order_id, paid=True)
+    return render(request, 'orders/thank_you.html', {'order': order})
