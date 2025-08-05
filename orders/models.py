@@ -1,5 +1,9 @@
 from django.db import models
 from shop.models import Product
+from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
+from coupons.models import Coupon
+
 
 # Payment method choices
 PAYMENT_METHOD_CHOICES = [
@@ -43,7 +47,14 @@ class Order(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
+    coupon = models.ForeignKey(Coupon,
+                                related_name='orders',
+                                null=True,
+                                blank=True,
+                                on_delete=models.SET_NULL)
+    discount = models.IntegerField(default=0,
+                                    validators=[MinValueValidator(0),
+                                                MaxValueValidator(100)])
     class Meta:
         ordering = ['-created']
 
@@ -51,7 +62,8 @@ class Order(models.Model):
         return f'Order {self.id} - {self.first_name} {self.last_name}'
 
     def get_total_cost(self):
-        return sum(item.get_cost() for item in self.items.all())
+        total_cost= sum(item.get_cost() for item in self.items.all())
+        return total_cost - total_cost * (self.discount / Decimal(100))
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)

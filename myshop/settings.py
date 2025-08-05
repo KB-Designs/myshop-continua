@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'coupons.apps.CouponsConfig',
     'orders.apps.OrdersConfig',
     'mpesa.apps.MpesaConfig',
     'cart.apps.CartConfig',
@@ -158,5 +159,5 @@ MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "21d739e7cdfc.ngrok-free.app",  # 👈 your Ngrok domain
+    "c292fcb6ac2a.ngrok-free.app",  # 👈 your Ngrok domain
 ]

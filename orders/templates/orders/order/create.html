@@ -12,11 +12,20 @@
     <ul>
       {% for item in cart %}
         <li>
-          {{ item.quantity }} x {{ item.product.name }} - Ksh {{ item.total_price }}
+          {{ item.quantity }} x {{ item.product.name }}
+          <span>Ksh {{ item.total_price|floatformat:2 }}</span>
         </li>
       {% endfor %}
+
+      {% if cart.coupon %}
+        <li>
+          "{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)
+          <span class="neg">- Ksh {{ cart.get_discount|floatformat:2 }}</span>
+        </li>
+      {% endif %}
     </ul>
-    <p><strong>Total: Ksh {{ cart.get_total_price }}</strong></p>
+
+    <p><strong>Total: Ksh {{ cart.get_total_price_after_discount|floatformat:2 }}</strong></p>
   </div>
 
   <hr>
