@@ -159,5 +159,11 @@ MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "c292fcb6ac2a.ngrok-free.app",  # 👈 your Ngrok domain
+    "f1323eebf952.ngrok-free.app",  # 👈 your Ngrok domain
 ]
+
+
+REDIS_HOST='localhost'
+REDIS_PORT= 6379
+REDIS_DB=1
+
