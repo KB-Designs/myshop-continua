@@ -5,78 +5,65 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Thank You!</h1>
-  <p>Your order has been placed successfully.</p>
-  <p>Your order number is <strong>#{{ order.id }}</strong>.</p>
+  <div class="max-w-2xl mx-auto text-center py-10">
+    <h1 class="text-3xl font-bold text-green-600 mb-4">Thank You!</h1>
+    <p class="text-lg text-gray-700 mb-2">Your order has been placed successfully.</p>
+    <p class="text-gray-700 mb-6">
+      Your order number is 
+      <strong class="text-black">#{{ order.id }}</strong>.
+    </p>
 
-  <p>
-    If you selected M-Pesa as your payment method, check your phone for an STK push request to complete the payment.
-  </p>
+    <p class="text-gray-600 mb-6">
+      If you selected <span class="font-semibold">M-Pesa</span> as your payment method, 
+      check your phone for an STK push request to complete the payment.
+    </p>
 
-  <!-- ✅ Payment status -->
-  {% if order.payment_status == 'Paid' %}
-    <p style="color: green;">✅ Payment Successful (Receipt: {{ order.payment_reference }})</p>
-    <script>
-      // Auto-redirect to home after 5 seconds
-      setTimeout(() => {
-        window.location.href = "{% url 'shop:product_list' %}";
-      }, 5000);
-    </script>
-  {% elif order.payment_status == 'Failed' %}
-    <p style="color: red;">❌ Payment Failed</p>
-  {% else %}
-    <p style="color: orange;">⌛ Payment Pending</p>
+    <!-- ✅ Payment status -->
+    {% if order.payment_status == 'Paid' %}
+      <p class="text-green-600 font-semibold mb-6">
+        ✅ Payment Successful (Receipt: {{ order.payment_reference }})
+      </p>
+      <script>
+        setTimeout(() => {
+          window.location.href = "{% url 'shop:product_list' %}";
+        }, 5000);
+      </script>
 
-    <!-- 🔄 Manual refresh button with spinner -->
-    <button id="refresh-btn" onclick="refreshPage()">🔄 Refresh Payment Status</button>
-    
-    <div id="spinner" style="display: none; margin-top: 10px;">
-      <div class="loader"></div>
-      <p>Checking payment status...</p>
+    {% elif order.payment_status == 'Failed' %}
+      <p class="text-red-600 font-semibold mb-6">❌ Payment Failed</p>
+
+    {% else %}
+      <p class="text-orange-500 font-semibold mb-4">⌛ Payment Pending</p>
+
+      <!-- Refresh Button -->
+      <button id="refresh-btn" 
+        class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition"
+        onclick="refreshPage()">
+        🔄 Refresh Payment Status
+      </button>
+
+      <!-- Spinner -->
+      <div id="spinner" class="mt-4 hidden">
+        <div class="w-6 h-6 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
+        <p class="text-gray-500 text-sm mt-2">Checking payment status...</p>
+      </div>
+    {% endif %}
+
+    <div class="mt-8">
+      <a href="{% url 'shop:product_list' %}" class="text-blue-500 hover:underline">
+        ← Back to Shopping
+      </a>
     </div>
-  {% endif %}
+  </div>
 
-  <p><a href="{% url 'shop:product_list' %}">← Back to Shopping</a></p>
-
-  <!-- CSS Spinner -->
-  <style>
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      margin: auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    button {
-      padding: 8px 12px;
-      border: none;
-      background-color: #3498db;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-  </style>
-
-  <!-- JavaScript -->
+  <!-- JS -->
   <script>
     function refreshPage() {
-      document.getElementById("spinner").style.display = "block";
+      document.getElementById("spinner").classList.remove("hidden");
       document.getElementById("refresh-btn").disabled = true;
       setTimeout(() => {
         location.reload();
-      }, 1500); // short delay to show spinner before reload
+      }, 1500);
     }
   </script>
 {% endblock %}

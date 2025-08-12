@@ -1,41 +1,57 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
-  <head>
+<html class="bg-white text-gray-800">
+<head>
     <meta charset="utf-8" />
     <title>{% block title %}My shop{% endblock %}</title>
-    <link href="{% static 'shop/base.css' %}" rel="stylesheet">
-  </head>
-  <body>
-    <div id="header">
-      <a href="{% url 'shop:product_list' %}" class="logo">My shop</a>
-    </div>
-    <div id="subheader">
-      <div class="cart">
-        {% with total_items=cart|length %}
-          {% if total_items > 0 %}
-            Your cart:
-            <a href='{% url "cart:cart_detail" %}'>
-             {{ total_items }} item{{ total_items|pluralize }},
-             Ksh.{{ cart.get_total_price }}
-            </a>
-          {% else %}
-             Your cart is empty.
-          {% endif %}
-        {% endwith %}
-      </div>
-      {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="alert alert-{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex flex-col">
 
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <a href="{% url 'shop:product_list' %}" class="text-2xl font-bold hover:text-blue-200">
+                My Shop
+            </a>
+            <div class="cart text-sm">
+                {% with total_items=cart|length %}
+                    {% if total_items > 0 %}
+                        <a href="{% url 'cart:cart_detail' %}" class="hover:underline">
+                            {{ total_items }} item{{ total_items|pluralize }},
+                            <span class="font-semibold">Ksh.{{ cart.get_total_price }}</span>
+                        </a>
+                    {% else %}
+                        <span>Your cart is empty.</span>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mx-auto mt-4">
+        <ul class="space-y-2">
+            {% for message in messages %}
+            <li class="p-3 rounded text-white {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500{% else %}bg-gray-500{% endif %}">
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
     </div>
-    <div id="content">
-      {% block content %}
-      {% endblock %}
-    </div>
-  </body>
+    {% endif %}
+
+    <!-- Main content -->
+    <main class="container mx-auto flex-1 p-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white py-4 mt-8 text-center">
+        &copy; {{ now|date:"Y" }} My Shop. All rights reserved.
+    </footer>
+
+</body>
 </html>

@@ -1,76 +1,85 @@
 {% extends "shop/base.html" %}
+{% load static %}
 
 {% block title %}
   Checkout
 {% endblock %}
 
 {% block content %}
-  <h1>Checkout</h1>
+<div class="max-w-4xl mx-auto p-6">
+  <h1 class="text-3xl font-bold text-blue-600 mb-6">Checkout</h1>
 
-  <div class="order-info">
-    <h3>Your Order</h3>
-    <ul>
+  <!-- Order Info -->
+  <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+    <h3 class="text-xl font-semibold text-gray-700 mb-4">Your Order</h3>
+    <ul class="divide-y divide-gray-200">
       {% for item in cart %}
-        <li>
-          {{ item.quantity }} x {{ item.product.name }}
-          <span>Ksh {{ item.total_price|floatformat:2 }}</span>
+        <li class="flex justify-between py-2">
+          <span>{{ item.quantity }} x {{ item.product.name }}</span>
+          <span class="font-medium">Ksh {{ item.total_price|floatformat:2 }}</span>
         </li>
       {% endfor %}
 
       {% if cart.coupon %}
-        <li>
-          "{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)
-          <span class="neg">- Ksh {{ cart.get_discount|floatformat:2 }}</span>
+        <li class="flex justify-between py-2 text-green-600">
+          <span>"{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)</span>
+          <span class="neg font-medium">- Ksh {{ cart.get_discount|floatformat:2 }}</span>
         </li>
       {% endif %}
     </ul>
-
-    <p><strong>Total: Ksh {{ cart.get_total_price_after_discount|floatformat:2 }}</strong></p>
+    <p class="mt-4 text-lg font-bold text-gray-800">
+      Total: Ksh {{ cart.get_total_price_after_discount|floatformat:2 }}
+    </p>
   </div>
 
-  <hr>
-
-  <form method="post" novalidate>
+  <!-- Checkout Form -->
+  <form method="post" novalidate class="bg-white shadow-md rounded-lg p-6">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Place Order</button>
+    <div class="space-y-4">
+      {{ form.as_p }}
+    </div>
+    <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+      Place Order
+    </button>
   </form>
 
-  <p><a href="{% url 'shop:product_list' %}">← Continue Shopping</a></p>
+  <p class="mt-6 text-blue-600 hover:underline">
+    <a href="{% url 'shop:product_list' %}">← Continue Shopping</a>
+  </p>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const countySelect = document.getElementById('id_county');
-      const pickupSelect = document.getElementById('id_pickup_station');
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const countySelect = document.getElementById('id_county');
+    const pickupSelect = document.getElementById('id_pickup_station');
 
-      function updatePickupStations(county) {
-        fetch(`/orders/ajax/load-pickup-stations/?county=${county}`)
-          .then(response => response.json())
-          .then(data => {
-            pickupSelect.innerHTML = '';
-            data.stations.forEach(function (station) {
-              const option = document.createElement('option');
-              option.value = station;
-              option.text = station;
-              pickupSelect.appendChild(option);
-            });
+    function updatePickupStations(county) {
+      fetch(`/orders/ajax/load-pickup-stations/?county=${county}`)
+        .then(response => response.json())
+        .then(data => {
+          pickupSelect.innerHTML = '';
+          data.stations.forEach(function (station) {
+            const option = document.createElement('option');
+            option.value = station;
+            option.text = station;
+            pickupSelect.appendChild(option);
           });
-      }
-
-      if (countySelect) {
-        countySelect.addEventListener('change', function () {
-          if (this.value) {
-            updatePickupStations(this.value);
-          }
         });
+    }
 
-        // Auto-trigger if a county is already selected (e.g. after form error)
-        if (countySelect.value) {
-          updatePickupStations(countySelect.value);
+    if (countySelect) {
+      countySelect.addEventListener('change', function () {
+        if (this.value) {
+          updatePickupStations(this.value);
         }
+      });
+
+      if (countySelect.value) {
+        updatePickupStations(countySelect.value);
       }
-    });
-  </script>
+    }
+  });
+</script>
 {% endblock %}
