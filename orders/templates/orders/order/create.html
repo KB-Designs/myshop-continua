@@ -1,85 +1,76 @@
 {% extends "shop/base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}
   Checkout
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto p-6">
+<div class="max-w-6xl mx-auto p-6">
   <h1 class="text-3xl font-bold text-blue-600 mb-6">Checkout</h1>
 
-  <!-- Order Info -->
-  <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-    <h3 class="text-xl font-semibold text-gray-700 mb-4">Your Order</h3>
-    <ul class="divide-y divide-gray-200">
-      {% for item in cart %}
-        <li class="flex justify-between py-2">
-          <span>{{ item.quantity }} x {{ item.product.name }}</span>
-          <span class="font-medium">Ksh {{ item.total_price|floatformat:2 }}</span>
-        </li>
-      {% endfor %}
-
-      {% if cart.coupon %}
-        <li class="flex justify-between py-2 text-green-600">
-          <span>"{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)</span>
-          <span class="neg font-medium">- Ksh {{ cart.get_discount|floatformat:2 }}</span>
-        </li>
-      {% endif %}
-    </ul>
-    <p class="mt-4 text-lg font-bold text-gray-800">
-      Total: Ksh {{ cart.get_total_price_after_discount|floatformat:2 }}
-    </p>
-  </div>
-
-  <!-- Checkout Form -->
-  <form method="post" novalidate class="bg-white shadow-md rounded-lg p-6">
-    {% csrf_token %}
-    <div class="space-y-4">
-      {{ form.as_p }}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <!-- Customer Info -->
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <h3 class="text-xl font-semibold text-gray-700 mb-4">Customer Information</h3>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="space-y-4">
+          {% for field in form %}
+            <div>
+              <label for="{{ field.id_for_label }}" class="block font-medium text-gray-700 mb-1">
+                {{ field.label }}
+              </label>
+              {{ field|add_class:"border border-gray-300 rounded px-3 py-2 bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" }}
+              {% if field.help_text %}
+                <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+              {% endif %}
+              {% for error in field.errors %}
+                <p class="text-sm text-red-500">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <button type="submit" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+          Place Order
+        </button>
+      </form>
     </div>
-    <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-      Place Order
-    </button>
-  </form>
 
-  <p class="mt-6 text-blue-600 hover:underline">
-    <a href="{% url 'shop:product_list' %}">← Continue Shopping</a>
-  </p>
+    <!-- Order Info -->
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <h3 class="text-xl font-semibold text-gray-700 mb-4">Your Order</h3>
+      <ul class="divide-y divide-gray-200">
+        {% for item in cart %}
+          <li class="flex items-center justify-between py-3">
+            <div class="flex items-center space-x-3">
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-12 h-12 object-cover rounded border border-gray-200">
+              <span>{{ item.quantity }} × {{ item.product.name }}</span>
+            </div>
+            <span class="font-medium">Ksh {{ item.total_price|floatformat:2 }}</span>
+          </li>
+        {% endfor %}
+
+        {% if cart.coupon %}
+          <li class="flex justify-between py-2 text-green-600">
+            <span>"{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)</span>
+            <span class="font-medium">- Ksh {{ cart.get_discount|floatformat:2 }}</span>
+          </li>
+        {% endif %}
+      </ul>
+      <p class="mt-4 text-lg font-bold text-gray-800">
+        Total: Ksh {{ cart.get_total_price_after_discount|floatformat:2 }}
+      </p>
+
+      
+
+      <p class="mt-6 text-blue-600 hover:underline">
+        <a href="{% url 'shop:product_list' %}">← Continue Shopping</a>
+      </p>
+    </div>
+
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const countySelect = document.getElementById('id_county');
-    const pickupSelect = document.getElementById('id_pickup_station');
-
-    function updatePickupStations(county) {
-      fetch(`/orders/ajax/load-pickup-stations/?county=${county}`)
-        .then(response => response.json())
-        .then(data => {
-          pickupSelect.innerHTML = '';
-          data.stations.forEach(function (station) {
-            const option = document.createElement('option');
-            option.value = station;
-            option.text = station;
-            pickupSelect.appendChild(option);
-          });
-        });
-    }
-
-    if (countySelect) {
-      countySelect.addEventListener('change', function () {
-        if (this.value) {
-          updatePickupStations(this.value);
-        }
-      });
-
-      if (countySelect.value) {
-        updatePickupStations(countySelect.value);
-      }
-    }
-  });
-</script>
 {% endblock %}

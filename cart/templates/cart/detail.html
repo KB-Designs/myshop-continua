@@ -1,6 +1,8 @@
 {% extends "shop/base.html" %}
 {% load static %}
 {% load i18n %}
+{% load widget_tweaks %}
+
 
 {% block title %}
     Your Shopping Cart
@@ -8,7 +10,7 @@
 
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6">Your Shopping Cart</h1>
+    <h1 class="text-2xl font-bold mb-6">Shopping Cart</h1>
 
     <div class="overflow-x-auto bg-white shadow rounded-lg">
         <table class="min-w-full text-sm text-left">
@@ -99,13 +101,17 @@
     {% endif %}
 
     <div class="mt-6">
-        <p class="mb-2 font-medium">Apply a coupon:</p>
-        <form action="{% url 'coupons:apply' %}" method="post" class="flex items-center space-x-2">
-            {{ coupon_apply_form }}
-            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Apply</button>
-            {% csrf_token %}
-        </form>
+    <p class="mb-2 font-medium">Apply a coupon:</p>
+    <form action="{% url 'coupons:apply' %}" method="post" class="flex items-center space-x-2">
+        {{ coupon_apply_form.code|add_class:"border border-gray-300 rounded px-3 py-2 bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        
+        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+            Apply
+        </button>
+        {% csrf_token %}
+    </form>
     </div>
+
 
     <div class="mt-6 flex justify-between">
         <a href="{% url 'shop:product_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">← Continue Shopping</a>
