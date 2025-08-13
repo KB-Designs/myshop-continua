@@ -1,0 +1,30 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"</h1>
+
+    {% if results %}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {% for product in results %}
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
+                    <a href="{{ product.get_absolute_url }}">
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}"
+                             alt="{{ product.name }}"
+                             class="rounded-lg mb-3 h-40 w-full object-cover">
+                    </a>
+                    <p class="text-sm text-gray-700">
+                        <a href="{{ product.get_absolute_url }}" class="hover:text-blue-600">
+                            {{ product.name }}
+                        </a>
+                    </p>
+                    <p class="text-blue-600 font-bold">Ksh.{{ product.price }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No products found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render, get_list_or_404
 from .models import Category, Product
 from cart.forms import CartAddProductForm
 from .recommender import Recommender
-
+from django.db.models import Q
 
 def product_list(request, category_slug=None):
     category=None
@@ -29,4 +29,17 @@ def product_detail(request, id, slug):
                   {'product':product,
                   'cart_product_form':cart_product_form,
                   'recommended_products':recommended_products})
-# Create your views here.
+
+def product_search(request):
+    query = request.GET.get('q')
+    results= []
+
+    if query:
+        results = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query), available=True)
+
+    return render(request,
+                  'shop/product_search.html',
+                  {'query': query,
+                   'results': results})
