@@ -39,3 +39,4 @@ Thumbs.db
 # Railway / deployment
 *.pid
 *.tar.gz
+.nixpacks
