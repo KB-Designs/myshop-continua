@@ -1,0 +1,41 @@
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+myenv/
+venv/
+ENV/
+env/
+.venv/
+
+# Environment variables
+.env
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.mo
+*.db
+db.sqlite3
+
+# Static files
+staticfiles/
+static/
+
+# Media files (if any)
+media/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Railway / deployment
+*.pid
+*.tar.gz
