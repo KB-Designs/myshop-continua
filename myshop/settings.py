@@ -110,8 +110,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Media files (user-uploaded content)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media' 
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -131,10 +132,7 @@ MPESA_INITIATOR_NAME = config('MPESA_INITIATOR_NAME')
 MPESA_INITIATOR_PASSWORD = config('MPESA_INITIATOR_PASSWORD')
 MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
 
-# Redis
-REDIS_HOST = config('REDIS_HOST', default='localhost')
-REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
-REDIS_DB = config('REDIS_DB', default=1, cast=int)
+
 
 # Cart
 CART_SESSION_ID = 'cart'

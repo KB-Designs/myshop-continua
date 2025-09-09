@@ -36,7 +36,6 @@
         class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200">
          Add to Cart
         </button>
-
       </form>
 
       <!-- Description -->
@@ -47,26 +46,49 @@
     </div>
   </div>
 
-  <!-- Recommended Products -->
-  {% if recommended_products %}
-    <div class="mt-12">
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">{% trans "People who bought this also bought" %}</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {% for p in recommended_products %}
-          <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
-            <a href="{{ p.get_absolute_url }}">
-              <img src="{% if p.image %}{{ p.image.url }}{% else %}
-                       {% static 'img/no_image.png' %}{% endif %}"
-                   alt="{{ p.name }}"
-                   class="rounded-lg mb-3 h-40 w-full object-cover">
-            </a>
-            <p class="text-sm text-gray-700">
-              <a href="{{ p.get_absolute_url }}" class="hover:text-blue-600">{{ p.name }}</a>
-            </p>
-          </div>
-        {% endfor %}
-      </div>
+  <!-- Related Products -->
+  {% if related_products %}
+  <div class="mt-12">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">You may also like</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {% for p in related_products %}
+        <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
+          <a href="{{ p.get_absolute_url }}">
+            <img src="{% if p.image %}{{ p.image.url }}{% else %}
+                     {% static 'img/no_image.png' %}{% endif %}"
+                 alt="{{ p.name }}"
+                 class="rounded-lg mb-3 h-40 w-full object-cover">
+          </a>
+          <p class="text-sm text-gray-700">
+            <a href="{{ p.get_absolute_url }}" class="hover:text-blue-600">{{ p.name }}</a>
+          </p>
+        </div>
+      {% endfor %}
     </div>
+  </div>
+  {% endif %}
+
+  <!-- Frequently Bought Together -->
+  {% if frequently_bought %}
+  <div class="mt-12">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">Frequently Bought Together</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {% for p in frequently_bought %}
+        <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
+          <a href="{{ p.get_absolute_url }}">
+            <img src="{% if p.image %}{{ p.image.url }}{% else %}
+                     {% static 'img/no_image.png' %}{% endif %}"
+                 alt="{{ p.name }}"
+                 class="rounded-lg mb-3 h-40 w-full object-cover">
+          </a>
+          <p class="text-sm text-gray-700">
+            <a href="{{ p.get_absolute_url }}" class="hover:text-blue-600">{{ p.name }}</a>
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
   {% endif %}
 </div>
+
 {% endblock %}

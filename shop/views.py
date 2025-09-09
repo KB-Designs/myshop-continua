@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404, render, get_list_or_404
 from .models import Category, Product
 from cart.forms import CartAddProductForm
-from .recommender import Recommender
-from django.db.models import Q
+from django.db.models import Q, Count
+from orders.models import OrderItem
+ 
 
 def product_list(request, category_slug=None):
     category=None
@@ -18,17 +19,37 @@ def product_list(request, category_slug=None):
                    'products':products})
 
 def product_detail(request, id, slug):
-    product=get_object_or_404(Product,id=id,slug=slug,available=True)                      
-    cart_product_form=CartAddProductForm()
+    product = get_object_or_404(Product, id=id, slug=slug, available=True)
+    cart_product_form = CartAddProductForm()
 
-    r = Recommender()
-    recommended_products= r.suggest_products_for([product] , 4)
+    # Related products (same category, excluding current product)
+    related_products = (
+        Product.objects.filter(category=product.category, available=True)
+        .exclude(id=product.id)[:4]
+    )
 
-    return render(request,
-                  'shop/product/detail.html',
-                  {'product':product,
-                  'cart_product_form':cart_product_form,
-                  'recommended_products':recommended_products})
+    # Frequently bought together
+    order_items = OrderItem.objects.filter(product=product)
+    product_ids = (
+        OrderItem.objects
+        .filter(order__in=[item.order for item in order_items])
+        .exclude(product=product)
+        .values('product')
+        .annotate(count=Count('product'))
+        .order_by('-count')[:4]
+    )
+    frequently_bought = Product.objects.filter(id__in=[p['product'] for p in product_ids])
+
+    return render(
+        request,
+        'shop/product/detail.html',
+        {
+            'product': product,
+            'cart_product_form': cart_product_form,
+            'related_products': related_products,
+            'frequently_bought': frequently_bought,
+        },
+    )
 
 def product_search(request):
     query = request.GET.get('q')
