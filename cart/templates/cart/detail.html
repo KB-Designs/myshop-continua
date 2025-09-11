@@ -3,7 +3,6 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-
 {% block title %}
     Your Shopping Cart
 {% endblock %}
@@ -101,17 +100,16 @@
     {% endif %}
 
     <div class="mt-6">
-    <p class="mb-2 font-medium">Apply a coupon:</p>
-    <form action="{% url 'coupons:apply' %}" method="post" class="flex items-center space-x-2">
-        {{ coupon_apply_form.code|add_class:"border border-gray-300 rounded px-3 py-2 bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-        
-        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-            Apply
-        </button>
-        {% csrf_token %}
-    </form>
+        <p class="mb-2 font-medium">Apply a coupon:</p>
+        <form action="{% url 'coupons:apply' %}" method="post" class="flex items-center space-x-2">
+            {{ coupon_apply_form.code|add_class:"border border-gray-300 rounded px-3 py-2 bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+            
+            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                Apply
+            </button>
+            {% csrf_token %}
+        </form>
     </div>
-
 
     <div class="mt-6 flex justify-between">
         <a href="{% url 'shop:product_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">← Continue Shopping</a>

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
-
+from django.contrib.auth.decorators import login_required
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
@@ -10,7 +10,7 @@ from orders.tasks import order_created
 from .models import Order
 
 
-
+@login_required  # ⬅ blocks anonymous users
 def order_create(request):
     cart = Cart(request)
 
@@ -18,11 +18,18 @@ def order_create(request):
         form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
+
+            # Attach the logged-in user
+            order.user = request.user  
+
+            # Handle coupon if applied
             if cart.coupon:
                 order.coupon = cart.coupon
                 order.discount = cart.coupon.discount
+
             order.save()    
 
+            # Save order items
             for item in cart:
                 OrderItem.objects.create(
                     order=order,
@@ -31,8 +38,8 @@ def order_create(request):
                     quantity=item['quantity']
                 )
 
+            # Clear cart and coupon session
             cart.clear()
-
             if 'coupon_id' in request.session:
                 del request.session['coupon_id']
 
@@ -54,6 +61,11 @@ def order_create(request):
         'form': form,
         'cart': cart,
     })
+
+
+def order_created_view(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/order/created.html', {'order': order})
 
 
 def order_created_view(request, order_id):

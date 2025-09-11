@@ -3,7 +3,7 @@ from shop.models import Product
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from coupons.models import Coupon
-
+from django.contrib.auth.models import User
 
 # Payment method choices
 PAYMENT_METHOD_CHOICES = [
@@ -53,8 +53,9 @@ class Order(models.Model):
                                 blank=True,
                                 on_delete=models.SET_NULL)
     discount = models.IntegerField(default=0,
-                                    validators=[MinValueValidator(0),
-                                                MaxValueValidator(100)])
+                                    validators=[MaxValueValidator(100)])
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+
     class Meta:
         ordering = ['-created']
 

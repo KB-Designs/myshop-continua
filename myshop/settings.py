@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'mpesa',
     'products',
     'coupons',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -138,3 +139,20 @@ MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
 CART_SESSION_ID = 'cart'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# If a user is not logged in, send them here:
+LOGIN_URL = 'accounts:login'
+
+# After successful login, send them back to checkout by default:
+LOGIN_REDIRECT_URL = "shop:product_list"
+
+# After logout, send them home (change to a named URL if you prefer)
+LOGOUT_REDIRECT_URL = '/'
+
+
+AUTHENTICATION_BACKENDS = [
+    "accounts.backends.EmailOrUsernameModelBackend",  # custom
+    "django.contrib.auth.backends.ModelBackend",      # default
+]
+
